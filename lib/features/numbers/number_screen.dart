@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:streams_exercises/features/numbers/number_repository.dart';
 
 class NumberScreen extends StatelessWidget {
@@ -15,8 +16,24 @@ class NumberScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Number Screen'),
       ),
-      body: const Center(
-        child: Text("Hier sollen die Zahlen stehen"),
+      body: Center(
+        child: StreamBuilder<int>(
+          stream: numberRepository.getNumberStream(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return const Text("Fehler beim Laden der Zahlen");
+            } else if (!snapshot.hasData) {
+              return const Text("Keine Zahlen verfügbar");
+            } else {
+              return Text(
+                snapshot.data!.toString(),
+                style: const TextStyle(fontSize: 24),
+              );
+            }
+          },
+        ),
       ),
     );
   }
